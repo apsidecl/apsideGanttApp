@@ -49,7 +49,11 @@
             :class="{ 'holiday-line': index + 1 === 16 }"
           ></span>
         </div>
-        <div class="gantt__wrapp" v-for="item in dataGantt.items" :key="item.id">
+        <div
+          class="gantt__wrapp"
+          v-for="item in dataGantt.items"
+          :key="item.id"
+        >
           <div class="gantt__row">
             <div class="gantt__row-first"></div>
             <div class="gantt__row-border"></div>
@@ -155,7 +159,7 @@ export default {
         empresa_id: 2,
       },
     ],
-    data : {},
+    data: {},
     dataGantt: {
       items: [
         {
@@ -409,9 +413,12 @@ export default {
     ],
     selectedDay: 0,
   }),
-  mounted() {
+  async mounted() {
     this.calcularDia(new Date().getMonth() + 1);
-    this.obtenerDatos();
+    const data = await this.obtenerDatos();
+    this.dataGantt = {
+      items: data
+    };
   },
   methods: {
     calcularDia(value) {
@@ -425,88 +432,180 @@ export default {
     filtrarDatos(id) {
       this.cliente = id;
     },
-    UID(){
-      return '_' + Math.random().toString(36).substr(2, 9);
+    UID() {
+      return (
+        '_' +
+        Math.random()
+          .toString(36)
+          .substr(2, 9)
+      );
     },
-    dateToNumber(date){
-    let dateNumber = 0
-    let numeroAsumar = 0
-    let  arrayDate = date.split("-")
-    arrayDate.shift()
-    switch(arrayDate[0]){
+    dateToNumber(date) {
+      let dateNumber = 0;
+      let numeroAsumar = 0;
+      let arrayDate = date.split('-');
+      arrayDate.shift();
+      switch (arrayDate[0]) {
         case '01':
-            numeroAsumar = 0
-        break
+          numeroAsumar = 0;
+          break;
         case '02':
-            numeroAsumar = 31
-        break
+          numeroAsumar = 31;
+          break;
         case '03':
-            numeroAsumar = 59
-        break
+          numeroAsumar = 59;
+          break;
         case '04':
-            numeroAsumar = 90
-        break
+          numeroAsumar = 90;
+          break;
         case '05':
-            numeroAsumar = 120
-        break
+          numeroAsumar = 120;
+          break;
         case '06':
-            numeroAsumar = 150
-        break
+          numeroAsumar = 150;
+          break;
         case '07':
-            numeroAsumar = 181
-        break
+          numeroAsumar = 181;
+          break;
         case '08':
-            numeroAsumar = 212
-        break
+          numeroAsumar = 212;
+          break;
         case '09':
-            numeroAsumar = 243
-        break
+          numeroAsumar = 243;
+          break;
         case '10':
-            numeroAsumar = 273
-        break
+          numeroAsumar = 273;
+          break;
         case '11':
-            numeroAsumar = 304
-        break
+          numeroAsumar = 304;
+          break;
         case '12':
-            numeroAsumar = 334
-        break
-    }
-    dateNumber =  parseInt(arrayDate[1]) + numeroAsumar
-    return dateNumber
-},
-    transformarItems(items){
-        let item = {}
-        let innerItem = {}
-        // let obj = {}
-        for(item in items){
-          for(innerItem in items[item]){
-            console.log('en inner item')
-            console.log(items[item][innerItem])
-            let obj = {
-            id: items[item][innerItem][0]['Índice'],
-            cliente_id: items[item][innerItem][0]['Cliente (from Nombre Hito)'][0],
-            description: `${items[item][innerItem][0]['Name (from Proyecto) 2 (from Nombre Hito)']} (${items[item][innerItem][0]['Name (from Cliente) (from Proyecto) (from Nombre Hito)']})`,
-            color: '#015a99',
-            start: this.dateToNumber(`${items[item][innerItem][0]['Inicio (from Id Asignacion)']}`),
-            end: (this.dateToNumber(`${items[item][innerItem][0]['Termino (from Id Asignacion)']}`)+1),
-            sub_sections: []
-          }
-          let obj2 = {
+          numeroAsumar = 334;
+          break;
+      }
+      dateNumber = parseInt(arrayDate[1]) + numeroAsumar;
+      return dateNumber;
+    },
+    getPorcentajePagos(items){
+      let aux = []
+      let item = {}
+      for (item in items){
+        aux.push(items[item][0]['Porcentaje']) 
+      }
+      return aux
+    },
+    itemsAsignacion(items) {
+      let item = {};
+      let aux = [];
 
-          } 
-          console.log(obj2)
-          items[item][innerItem] = obj
-          }
-          // console.log(items[item])
-          
-          // console.log(obj)
-          // items[item][innerItem][0] = obj
+      for (item in items) {
+          const obj = {
+            id: items[item][0]['Índice'],
+            cliente_id:
+              items[item][0]['Cliente (from Nombre Hito)'][0],
+            description: `${items[item][0]['Name (from Proyecto) 2 (from Nombre Hito)']} (${items[item][0]['Name (from Cliente) (from Proyecto) (from Nombre Hito)']})`,
+            color: '#015a99',
+            start: this.dateToNumber(
+              `${items[item][0]['Inicio (from Id Asignacion)']}`
+            ),
+            end:
+              this.dateToNumber(
+                `${items[item][0]['Termino (from Id Asignacion)']}`
+              ) + 1,
+            sub_sections: [
+              
+            ],
+          };
+          aux.push(obj);
+      }
+      console.log(aux)
+      return aux;
+    },
+    itemsAsignacionReal(items) {
+      let item = {};
+      let aux = [];
+      for (item in items) {
+          const obj = {
+            id: items[item][0]['Índice'],
+            cliente_id:
+              items[item][0]['Cliente (from Nombre Hito)'][0],
+            description: null,
+            color: 'rgba(95, 174, 231, 0.8)',
+            start: this.dateToNumber(
+              `${items[item][0]['Inicio (from Id Asignacion)']}`
+            ),
+            end:
+              this.dateToNumber(
+                `${items[item][0]['Termino (from Id Asignacion)']}`
+              ) + 1,
+            sub_sections: [],
+          };
+          aux.push(obj);
+      }
+
+      return aux;
+    },
+     partDate(start,end,cont,porcentajePagos){
+       let arr = []
+       let totalDays = Math.abs(end-start)
+       let diasTotales = totalDays/porcentajePagos.length
+       let startDay = (start + diasTotales) * cont
+       let endDay = (end - diasTotales) * cont + 2
+       arr.push(startDay,endDay)
+       return arr
+    },
+    itemsPagoAsignacion(items) {
+      let item = {};
+      let aux = [];
+      let porcentajePago = {}
+      let porcentajePagos = this.getPorcentajePagos(items)
+      console.log(porcentajePagos)
+      console.log('items recibidos')
+      console.log(items)
+      //modificando data
+      
+      
+      for (item in items) {
+        let subsecciones= []
+        for(porcentajePago in porcentajePagos){
+          let cont= 1
+          subsecciones.push({
+            id:1,
+            description:`${porcentajePagos[porcentajePago]}`,
+            color: '#57930A',
+            start: this.partDate((this.dateToNumber(`${items[item][0]['Inicio (from Id Asignacion)']}`)),this.dateToNumber(`${items[item][0]['Termino (from Id Asignacion)']}`),cont,porcentajePagos)[0],
+            end:this.partDate((this.dateToNumber(`${items[item][0]['Inicio (from Id Asignacion)']}`)),this.dateToNumber(`${items[item][0]['Termino (from Id Asignacion)']}`),cont,porcentajePagos)[1],
+          })
+          cont++
         }
-      },
+          const obj = {
+            id: items[item][0]['Índice'],
+            cliente_id:
+              items[item][0]['Cliente (from Nombre Hito)'][0],
+            description: `${items[item][0]['Name (from Proyecto) 2 (from Nombre Hito)']} (${items[item][0]['Name (from Cliente) (from Proyecto) (from Nombre Hito)']})`,
+            color: '#85BB40',
+            start: this.dateToNumber(
+              `${items[item][0]['Inicio (from Id Asignacion)']}`
+            ),
+            end:
+              this.dateToNumber(
+                `${items[item][0]['Termino (from Id Asignacion)']}`
+              ) + 1,
+            sub_sections: subsecciones,
+          };
+          
+          console.log('aux')
+          console.log(aux)
+          aux.push(obj)
+          
+      }
+
+      return aux;
+    },
     async obtenerDatos() {
       const datosGantt = await useAir();
-      console.log('en datosGantt')
-      console.log(datosGantt)
+      console.log('en datosGantt');
+      console.log(datosGantt);
       // Agrupar asignaciones de proyectos por cada desarrollador
       const asignaciones = datosGantt.arrayCompleto.reduce(
         (acum, currValue) => {
@@ -525,12 +624,10 @@ export default {
         {}
       );
 
-
-
       // Agrupar proyectos por cada asignación
       // eslint-disable-next-line no-unused-vars
-      const proyectos = (arr) => arr.reduce(
-        (acum, currValue) => {
+      const proyectos = (arr) =>
+        arr.reduce((acum, currValue) => {
           if (currValue['Name (from Proyecto) 2 (from Nombre Hito)']) {
             acum[currValue['Name (from Proyecto) 2 (from Nombre Hito)'][0]] = [
               ...(acum[
@@ -542,39 +639,35 @@ export default {
             acum['Sin Proyecto'] = [...(acum['Sin Proyecto'] || []), currValue];
           }
           return acum;
-        },
-        {}
-      );
+        }, {});
 
+      console.log({ asignaciones });
 
-      console.log({asignaciones})
-
-      let data = Object.entries(asignaciones).map(([key, value], index) => {
+      const data = Object.entries(asignaciones).map(([key, value], index) => {
         return {
           id: index + 1,
-          name:key,
-          sections: [{
-            id:index + 1,
-            name: 'Asignación',
-            items: [
-              {
-                item:proyectos(value)
-              }
-            ]
-          }]
-        }
+          name: key,
+          sections: [
+            {
+              id: 1,
+              name: 'Asignación',
+              items: [...this.itemsAsignacion(proyectos(value))],
+            },
+            {
+              id: 2,
+              name: 'Asignación real',
+              items: [...this.itemsAsignacionReal(proyectos(value))],
+            },
+            {
+              id: 3,
+              name: 'Indice PxA',
+              items: [...this.itemsPagoAsignacion(proyectos(value))]
+            }
+          ],
+        };
       });
-      // console.log({data})
-      // const data2 = 
-      for(let i = 0; i < data.length; i++){
-        // console.log('dentro del for')
-        // console.log(data[i].sections[0].items[0])
-        this.transformarItems(data[i].sections[0].items[0])
-      }
-        console.log({data})
-        this.dataGantt = {data}
-        this.data = {data}
-        
+      console.log(data)
+      return data;
     },
   },
 };
