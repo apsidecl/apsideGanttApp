@@ -15,11 +15,13 @@ las asignaciones con sus pagos respectivos
 dentro de useAir.js, se encuentra el llamado a la API de airtable, la cuál retorna los valores que luego serán formateados 
 
 ```
+![image](https://user-images.githubusercontent.com/58343999/127672338-c20286b9-883a-482d-8055-dd453df4e444.png)
+![image](https://user-images.githubusercontent.com/58343999/127674782-e6722376-c7ad-4876-9c4f-eac3bfba6c4a.png)
 ![image](https://user-images.githubusercontent.com/58343999/127399941-8622ab15-3bec-44ad-9feb-39c62b7841ba.png)
 
 ```
 El objeto data será el que tenga la información que se enviará mediante mounted()
-parámetros de las funciones: la data traída desde useAir(), correspondiente al array con 
+parámetros de las funciones: la data traída desde useAir() y formateada en , correspondiente al array con 
 los datos correspondientes a las columnas de la tabla PxA
 ```
 
